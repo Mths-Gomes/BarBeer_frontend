@@ -3,20 +3,16 @@ import React, { useMemo } from 'react';
 import GlobalStyle from './styles/global';
 import SignIn from './pages/signin';
 import SignUp from './pages/signup';
-import AuthContext from './context/authContext';
+import { AuthProvider } from './context/authContext';
 
-const App: React.FC = () => {
-  const userContext = useMemo(() => ({ name: 'Matheus' }), []);
+const App: React.FC = () => (
+  <>
+    <AuthProvider>
+      <SignIn />
+    </AuthProvider>
 
-  return (
-    <>
-      <AuthContext.Provider value={userContext}>
-        <SignIn />
-      </AuthContext.Provider>
-
-      <GlobalStyle />
-    </>
-  );
-};
+    <GlobalStyle />
+  </>
+);
 
 export default App;
