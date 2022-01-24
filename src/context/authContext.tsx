@@ -1,4 +1,10 @@
-import React, { createContext, useMemo, useCallback, useState } from 'react';
+import React, {
+  createContext,
+  useMemo,
+  useCallback,
+  useState,
+  useContext,
+} from 'react';
 import api from '../services/apiClient';
 
 interface AuthState {
@@ -10,14 +16,12 @@ interface SignInCredentials {
   password: string;
 }
 
-interface AuthContextState {
+interface AuthContextData {
   user: object;
   signIn(credentials: SignInCredentials): Promise<void>;
 }
 
-export const AuthContext = createContext<AuthContextState>(
-  {} as AuthContextState,
-);
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>(() => {
@@ -43,8 +47,6 @@ export const AuthProvider: React.FC = ({ children }) => {
 
     const { token, userForResponse } = response.data;
 
-    console.log(token, userForResponse);
-
     localStorage.setItem('@BarBeer:token', token);
     localStorage.setItem('@BarBeer:user', JSON.stringify(userForResponse));
 
@@ -60,3 +62,13 @@ export const AuthProvider: React.FC = ({ children }) => {
     <AuthContext.Provider value={userContext}>{children}</AuthContext.Provider>
   );
 };
+
+export function useAuth(): AuthContextData {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+
+  return context;
+}
