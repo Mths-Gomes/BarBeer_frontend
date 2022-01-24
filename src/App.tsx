@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import GlobalStyle from './styles/global';
 import SignIn from './pages/signin';
