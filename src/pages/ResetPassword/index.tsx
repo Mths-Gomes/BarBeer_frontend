@@ -3,7 +3,7 @@ import { FiLogIn, FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
@@ -11,6 +11,7 @@ import { Container, Content, AnimationContainer, Background } from './styles';
 import logo from '../../assets/logoImg.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
+import api from '../../services/apiClient';
 
 interface ResetPasswordFormData {
   password: string;
@@ -21,6 +22,8 @@ const ResetPassword: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { addToast } = useToast();
+
+  const location = useLocation();
 
   const handleSubmit = useCallback(
     async (data: ResetPasswordFormData) => {
@@ -36,6 +39,19 @@ const ResetPassword: React.FC = () => {
         });
 
         await schema.validate(data, { abortEarly: false });
+
+        const { password, passwordConfirmation } = data;
+        const token = location.search.replace('?token=', '');
+
+        if (!token) {
+          throw new Error();
+        }
+
+        await api.post('/password-reset', {
+          password,
+          passwordConfirmation,
+          token,
+        });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -54,7 +70,7 @@ const ResetPassword: React.FC = () => {
         });
       }
     },
-    [addToast],
+    [addToast, location.search],
   );
 
   return (
